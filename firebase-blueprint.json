@@ -1,0 +1,82 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "User profile information and role.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["client", "handler", "admin"] },
+        "phone": { "type": "string" }
+      },
+      "required": ["uid", "name", "email", "role"]
+    },
+    "Shipment": {
+      "title": "Shipment",
+      "description": "Details of a shipment or delivery.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "trackingNumber": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "in-transit", "delivered", "exception"] },
+        "origin": { "type": "string" },
+        "destination": { "type": "string" },
+        "clientUid": { "type": "string" },
+        "handlerUid": { "type": "string" },
+        "packageDetails": { "type": "string" },
+        "weight": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "trackingNumber", "status", "clientUid"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "A message between a client and a handler.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "shipmentId": { "type": "string" },
+        "senderUid": { "type": "string" },
+        "text": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "shipmentId", "senderUid", "text", "timestamp"]
+    },
+    "Report": {
+      "title": "Report",
+      "description": "A report sent from a handler to the CEO.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "handlerUid": { "type": "string" },
+        "handlerName": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "type": { "type": "string", "enum": ["daily", "weekly", "incident", "general"] },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "handlerUid", "title", "content", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profiles stored by UID."
+    },
+    "/shipments/{shipmentId}": {
+      "schema": "Shipment",
+      "description": "Shipment data."
+    },
+    "/shipments/{shipmentId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Messages related to a specific shipment."
+    },
+    "/reports/{reportId}": {
+      "schema": "Report",
+      "description": "Reports for the CEO."
+    }
+  }
+}

@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && (
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+        (request.auth.token.email == "mimjum88@gmail.com" && request.auth.token.email_verified == true)
+      );
+    }
+
+    function isHandler() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'handler';
+    }
+
+    // User Profiles
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    // Shipments
+    match /shipments/{shipmentId} {
+      allow read: if isAuthenticated() && (
+        resource.data.clientUid == request.auth.uid || 
+        resource.data.handlerUid == request.auth.uid || 
+        isAdmin()
+      );
+      allow create: if isAuthenticated(); // Allow clients to create shipment requests
+      allow update: if isAdmin() || isHandler() || (isAuthenticated() && resource.data.clientUid == request.auth.uid);
+      allow delete: if isAdmin();
+
+      // Messages
+      match /messages/{messageId} {
+        allow read: if isAuthenticated() && (
+          get(/databases/$(database)/documents/shipments/$(shipmentId)).data.clientUid == request.auth.uid ||
+          get(/databases/$(database)/documents/shipments/$(shipmentId)).data.handlerUid == request.auth.uid ||
+          isAdmin()
+        );
+        allow create: if isAuthenticated() && (
+          get(/databases/$(database)/documents/shipments/$(shipmentId)).data.clientUid == request.auth.uid ||
+          get(/databases/$(database)/documents/shipments/$(shipmentId)).data.handlerUid == request.auth.uid ||
+          isAdmin()
+        );
+      }
+    }
+    
+    // Public tracking (read-only by ID)
+    match /shipments/{shipmentId} {
+      allow get: if true; // Allow anyone to track by ID
+    }
+
+    // Reports
+    match /reports/{reportId} {
+      allow read: if isAdmin();
+      allow create: if isHandler();
+      allow update, delete: if isAdmin();
+    }
+  }
+}
