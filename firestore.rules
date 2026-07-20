@@ -1,0 +1,112 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && (
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+        (request.auth.token.email == "mimjum88@gmail.com" && request.auth.token.email_verified == true)
+      );
+    }
+
+    function isHandler() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'handler';
+    }
+
+    function isSeller() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'seller';
+    }
+
+    // User Profiles
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    // Businesses
+    match /businesses/{businessId} {
+      allow read: if isAuthenticated();
+      allow create: if isSeller();
+      allow update: if isAdmin() || (isAuthenticated() && resource.data.ownerUid == request.auth.uid);
+      allow delete: if isAdmin();
+    }
+
+    // Products
+    match /products/{productId} {
+      allow read: if isAuthenticated();
+      allow create: if isSeller(); // Ideally check if businessId belongs to user
+      allow update, delete: if isAdmin() || (isAuthenticated() && get(/databases/$(database)/documents/businesses/$(resource.data.businessId)).data.ownerUid == request.auth.uid);
+    }
+
+    // Shipments
+    match /shipments/{shipmentId} {
+      allow read: if isAuthenticated() && (
+        resource.data.clientUid == request.auth.uid || 
+        resource.data.handlerUid == request.auth.uid || 
+        isAdmin()
+      );
+      allow create: if isAuthenticated(); // Allow clients to create shipment requests
+      allow update: if isAdmin() || isHandler() || (isAuthenticated() && resource.data.clientUid == request.auth.uid);
+      allow delete: if isAdmin();
+
+      // Messages
+      match /messages/{messageId} {
+        allow read: if isAuthenticated() && (
+          get(/databases/$(database)/documents/shipments/$(shipmentId)).data.clientUid == request.auth.uid ||
+          get(/databases/$(database)/documents/shipments/$(shipmentId)).data.handlerUid == request.auth.uid ||
+          isAdmin()
+        );
+        allow create: if isAuthenticated() && (
+          get(/databases/$(database)/documents/shipments/$(shipmentId)).data.clientUid == request.auth.uid ||
+          get(/databases/$(database)/documents/shipments/$(shipmentId)).data.handlerUid == request.auth.uid ||
+          isAdmin()
+        );
+      }
+    }
+    
+    // Public tracking (read-only by ID)
+    match /shipments/{shipmentId} {
+      allow get: if true; // Allow anyone to track by ID
+    }
+
+    // Reports
+    match /reports/{reportId} {
+      allow read: if isAdmin();
+      allow create: if isHandler();
+      allow update, delete: if isAdmin();
+    }
+
+    // Broadcasts (Admin announcements)
+    match /broadcasts/{broadcastId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Direct Messages
+    match /direct_messages/{messageId} {
+      allow read: if isAuthenticated() && (
+        resource.data.fromUid == request.auth.uid || 
+        resource.data.toUid == request.auth.uid ||
+        isAdmin()
+      );
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin() || (isAuthenticated() && resource.data.fromUid == request.auth.uid);
+    }
+
+    // Logs (Admin only)
+    match /logs/{logId} {
+      allow read, write: if isAdmin();
+    }
+  }
+}
