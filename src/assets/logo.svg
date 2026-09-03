@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
-  <!-- Outer Shield -->
-  <path d="M50 8 L85 22 V50 C85 70 70 85 50 93 C30 85 15 70 15 50 V22 L50 8 Z" fill="#111113" stroke="#facc15" stroke-width="4" stroke-linejoin="round" />
-  <!-- Inner Shield Accent -->
-  <path d="M50 15 L77 26 V48 C77 64 65 77 50 84 C35 77 23 64 23 48 V26 L50 15 Z" fill="#080809" stroke="rgba(250, 204, 21, 0.3)" stroke-width="2" />
-  <!-- Lightning Bolt (Flashpoint) -->
-  <polygon points="53,20 32,52 48,52 41,80 66,44 49,44" fill="#facc15" />
-</svg>
