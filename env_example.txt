@@ -1,0 +1,39 @@
+# ==============================================================================
+# FLASHPOINT DELIVERY - PRODUCTION ENVIRONMENT CONFIGURATION TEMPLATE
+# Copy these keys into your Render Dashboard (Environment tab) or Vercel Settings
+# ==============================================================================
+
+# 1. SUPABASE DATABASE & PHOTO/MEDIA STORAGE CONFIGURATION
+# Obtain from your Supabase Project Settings -> API (https://supabase.com)
+VITE_SUPABASE_URL=https://your-supabase-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.your-anon-key-here
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key-here
+
+# 2. PAYMENTS & MONEY TRANSACTIONS (MTN Mobile Money, Airtel Money, Visa/Mastercard)
+# Obtain from Flutterwave Dashboard (https://dashboard.flutterwave.com)
+VITE_FLUTTERWAVE_PUBLIC_KEY=FLWPUBK-xxxxxxxxxxxxxxxxxxxxxxxx-X
+FLUTTERWAVE_SECRET_KEY=FLWSECK-xxxxxxxxxxxxxxxxxxxxxxxx-X
+FLUTTERWAVE_ENCRYPTION_KEY=FLWSECK_ELEQxxxxxxxx
+
+# Alternative Paystack Keys (https://dashboard.paystack.com)
+VITE_PAYSTACK_PUBLIC_KEY=pk_live_xxxxxxxxxxxxxxxxxxxxxxxx
+PAYSTACK_SECRET_KEY=sk_live_xxxxxxxxxxxxxxxxxxxxxxxx
+
+# 3. TRANSACTIONAL EMAIL NOTIFICATIONS
+# Obtain from Resend Dashboard (https://resend.com)
+RESEND_API_KEY=re_123456789_abcdefghijklmnopqrstuvwxyz
+NOTIFICATION_FROM_EMAIL=notifications@flashpoint.co.ug
+
+# 4. SMS & MOBILE MESSAGING NOTIFICATIONS (Uganda MTN/Airtel SMS Alerts)
+# Obtain from Africa's Talking Dashboard (https://africastalking.com)
+AFRICASTALKING_USERNAME=sandbox
+AFRICASTALKING_API_KEY=atsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+AFRICASTALKING_SENDER_ID=FLASHPOINT
+
+# Alternative Twilio Keys (https://www.twilio.com)
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_PHONE_NUMBER=+1234567890
+
+# 5. SECURITY & VERIFICATION SECRET
+APP_JWT_SECRET=flashpoint-classified-super-secret-jwt-key-2026
